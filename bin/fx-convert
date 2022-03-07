@@ -3,9 +3,6 @@
 # fx -- a simple utility to print ansi styles and colors
 #
 
-set -Eeo pipefail # fail on errors, even within pipes
-set +o posix      # using some noncompliant process redirection features
-
 bindir="$(cd "${0%/*}/." && pwd -P)"
 source "${bindir}/utils.sh"
 
@@ -39,24 +36,25 @@ END
 }
 
 main() {
-  local fmt
-  local -a colors styles ansi_map
+  local fmt arg verbose command=convert
+  local -a colors styles ansi_map args
   local -A color_map style_map
 
-  [[ "$1" == "convert" ]] && shift
-
-  fmt=${1}
   init
+
+  options ${1:+"$@"}
+  set -- ${args[0]:+"${args[@]}"}
 
   [[ $# -eq 0 ]] && oops "What would you like to convert?"
 
+  fmt="${1}"
+
   case $fmt in
-    -h|--help|help)          docs                                      ;;
-    --to-hex)       shift ;  rgb_to_hex $@                             ;;
-    --to-rgb)       shift ;  hex_to_rgb $@                             ;;
-    --to-dec)       shift ;  percent_to_rgb $@                         ;;
-    -*)                      oops "Unrecognized FORMAT: '${fmt}'"      ;;
-    *)                       oops "Missing required FORMAT."           ;;
+    --to-hex)       shift ; debug "rgb_to_hex"     ; rgb_to_hex $@                             ;;
+    --to-rgb)       shift ; debug "hex_to_rgb"     ; hex_to_rgb $@                             ;;
+    --to-dec)       shift ; debug "percent_to_rgb" ; percent_to_rgb $@                         ;;
+    -*)                     oops "Unrecognized FORMAT: '${fmt}'"      ;;
+    *)                      oops "Missing required FORMAT."           ;;
   esac
 }
 

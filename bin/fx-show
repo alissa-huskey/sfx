@@ -3,9 +3,6 @@
 # fx -- a simple utility to print ansi styles and colors
 #
 
-set -Eeo pipefail # fail on errors, even within pipes
-set +o posix      # using some noncompliant process redirection features
-
 bindir="$(cd "${0%/*}/." && pwd -P)"
 source "${bindir}/utils.sh"
 
@@ -228,11 +225,13 @@ guess_format() {
 main() {
   local -a colors styles ansi_map
   local -A color_map style_map
-  local format
+  local format command=show
 
   [[ "$1" == "show" ]] && shift
 
   init
+  options ${1:+"$@"}
+  set -- ${args[0]:+"${args[@]}"}
 
   if [[ $1 =~ ^[-] ]]; then
     format="$1"
@@ -242,7 +241,6 @@ main() {
   fi
 
   case $format in
-    -h|--help|help)     docs                 ;;
     --rgb)              show_rgb "$@"        ;;
     --color)            show_color "$@"      ;;
     --style)            show_style "$@"      ;;

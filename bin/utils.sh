@@ -2,6 +2,8 @@
 #
 #
 
+FX_VERSION=0.1.0
+
 # exit with an error message
 abort() {
   error "${@}"
@@ -22,8 +24,12 @@ error() {
 
 # print error message if in debug mode
 debug() {
-  return
+  is_verbose || return
   printf "\e[33m>\e[0m %s\n" "${*}"
+}
+
+is_verbose() {
+  [[ -n ${verbose} ]]
 }
 
 valid_256() {
@@ -241,3 +247,17 @@ percent_to_rgb() {
   echo $rgb
 }
 
+# strips the options from args
+# relies on command being defined in main
+options() {
+  local arg
+
+  for arg in $@; do
+    case "$arg" in
+      "$command")     :                       ;;
+      -h|--help|help) docs ; exit             ;;
+      -v|--verbose)   verbose=true            ;;
+      *)              args+=( "$arg" )        ;;
+    esac
+  done
+}

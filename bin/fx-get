@@ -3,9 +3,6 @@
 # fx -- a simple utility to print ansi styles and colors
 #
 
-set -Eeo pipefail # fail on errors, even within pipes
-set +o posix      # using some noncompliant process redirection features
-
 bindir="$(cd "${0%/*}/." && pwd -P)"
 source "${bindir}/utils.sh"
 
@@ -47,6 +44,8 @@ END
 get_hex() {
   local ofs="$IFS" IFS=':/' color_num r g b
 
+  debug "get_rgb()"
+
   if [[ "$1" == "-s" ]]; then
     shift
     silent=true
@@ -77,17 +76,19 @@ get_hex() {
 }
 
 get_rgb() {
+  debug "get_rgb()"
   local hex
   get_hex -s $1
   hex_to_rgb "$hex"
 }
 
 main() {
-  local fmt color
+  local fmt color command=get
   local -a colors styles ansi_map
   local -A color_map style_map
 
-  [[ "$1" == "get" ]] && shift
+  options ${1:+"$@"}
+  set -- ${args[0]:+"${args[@]}"}
 
   fmt="$1" color="$2"
 

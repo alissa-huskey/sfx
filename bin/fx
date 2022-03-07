@@ -3,9 +3,6 @@
 # fx -- a simple utility to print ansi styles and colors
 #
 
-set -Eeo pipefail # fail on errors, even within pipes
-set +o posix      # using some noncompliant process redirection features
-
 bindir="$(cd "${0%/*}/." && pwd -P)"
 source "${bindir}/utils.sh"
 
@@ -32,6 +29,10 @@ docs() {
 END
 }
 
+version() {
+  printf "fx version %s\n" "${FX_VERSION}"
+}
+
 # print usage information
 usage() {
   cat <<END
@@ -40,30 +41,56 @@ END
 }
 
 main() {
-  local type=${1:-256}
-  local -a colors styles ansi_map
+  local cmd arg
+  local -a colors styles ansi_map options args opts
   local -A color_map style_map
 
   init
 
-  case $type in
-    -h|--help|help)       docs                                      ;;
+  for arg in $@; do
+    case "$arg" in
+      -v|--verbose)
+        verbose=true
+        opts+=( "$arg" )
+        ;;
 
-    list) shift ; ${bindir}/fx-list "$@"   ;;
+      *)
+        args+=( "$arg" )
+        ;;
+    esac
+  done
+  set -- ${args[0]:+"${args[@]}"} ${opts[0]:+"${opts[@]}"}
+
+  # command aliases
+  case $1 in
+    # list type args
     16|--16|256|--256|-s|--style*|style*|all)
-      ${bindir}/fx-list "$@"
+      cmd="list"
                                                                     ;;
+    # more list type args
     -f|--fg|fg|-b|--bg|bg)
-      ${bindir}/fx-list "$@"
+      cmd="list"
                                                                     ;;
+    # this means the type is blank, so use default
+    -v|--verbose)
+      cmd="list"
+                                                                    ;;
+    # convert format args
+    --to*)
+      cmd="convert"
+                                                                    ;;
+  esac
 
+  cmd="${1:-list}"
 
+  case $cmd in
+    -h|--help|help)       docs                                      ;;
+    -V|--version|version) version                                   ;;
+    list)                 ${bindir}/fx-list "$@"                    ;;
     get)                  ${bindir}/fx-get "$@"                     ;;
     show)                 ${bindir}/fx-show "$@"                    ;;
-    --to-*|convert)       ${bindir}/fx-convert "$@"                 ;;
-
-
-     *)                   oops "Unrecognized argument: '${type}'"   ;;
+    convert)              ${bindir}/fx-convert "$@"                 ;;
+     *)                   oops "Unrecognized command '${cmd}'"      ;;
   esac
 }
 

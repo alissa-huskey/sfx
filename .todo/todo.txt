@@ -2,3 +2,4 @@
 2022-03-06 add global --verbose
 2022-03-06 fix show hex so it shows the hex code, not the rgb value
 2022-03-06 show fg and bg of all colors
+2022-03-06 in convert rename --to-* to --*

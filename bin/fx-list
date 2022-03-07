@@ -12,6 +12,8 @@ source "${bindir}/utils.sh"
 colors_16() {
   local code style layer varient name
 
+  debug "colors_16()"
+
   echo
   for style in 0 7; do                   # default, invert
     for varient in 3 9; do               # normal, light
@@ -33,6 +35,8 @@ colors_16() {
 #
 colors_256() {
   local layer="${1:-fg}" style
+
+  debug "colors_256()"
 
   layer="${layer##*-}"
   [[ ${#layer} -eq 1 ]] && layer="${layer}g"
@@ -58,6 +62,8 @@ colors_256() {
 styles() {
   local name
 
+  debug "styles()"
+
   echo
   for i in {0..9}; do
     name=${styles[$i]}
@@ -69,6 +75,8 @@ styles() {
 
 # show all styles and colors
 all() {
+  debug "all()"
+
   {
     styles
     colors_16
@@ -103,23 +111,25 @@ END
 }
 
 main() {
-  local type=${1:-256}
+  local type verbose command=list
   local -a colors styles ansi_map
   local -A color_map style_map
 
-  [[ $# -ge 1 ]] && shift
+  options ${1:+"$@"}
+  set -- ${args[0]:+"${args[@]}"}
 
   init
 
+  type="${1:-256}"
+
   case $type in
-    -h|--help|help)       docs                                     ;;
     16|-16)               colors_16                                ;;
     -f|--fg|fg)           colors_256 fg                            ;;
     256|--256)            colors_256 ${1:-"$@"}                    ;;
     -b|--bg|bg)           colors_256 bg                            ;;
     -s|--style*|style*)   styles                                   ;;
     all)                  all                                      ;;
-     *)                   oops "Invalid argument: '${type}'"       ;;
+    *)                    oops "Invalid argument: '${type}'"       ;;
   esac
 }
 
