@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+asciinema rec --overwrite --quiet -t "fx demo" -i 2 etc/demo.cast
+

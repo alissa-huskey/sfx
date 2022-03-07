@@ -1,0 +1,84 @@
+Fx demo
+
+# fx is a small utility for viewing shell effects
+# my most common use is listing colors and styles
+
+Fx list
+
+# 256 colors are displayed by default
+# but you can show 16 colors instead
+
+Fx list 16
+
+# styles…
+
+Fx list styles
+
+# background colors…
+
+Fx list 256 —bg
+
+# or all at once
+
+Fx list all
+
+# the show command lets you see a particular color or style
+
+Fx show —help
+
+fx show --rgb 0 175 135
+Fx show —hex af38ff
+
+# fx will do its best to guess at what you want to see
+
+Fx show yellow
+Fx show 204
+Fx show bright blue
+Fx show bold
+
+#but you can specify with a --format flag
+# for example, for a number a 256 color is shown by default
+
+Fx show 31
+
+# or you can use the —code flag to show the color associated with that escape code
+
+# —8 shows you all the colors for that ansi number (ie. last digit)
+
+Fx show —8 6
+
+# —16 shows the ansi color numbered 0-16
+
+Fx show —16 13
+
+# the get command reports the actual color associated a 256 color
+# (only supported if bash 4+ is installed)
+
+fx get --rgb 104
+fx show --256 104
+fx show --rgb 135 135 215
+
+# the result can be formatted as either --rgb or --hex
+
+fx get --hex 45
+Fx show 00d7ff
+Fx show 45
+
+# the convert command is for converting color formats
+# from hex to rgb
+
+Fx convert —to-rgb 00d7ff
+Fx show 0 215 255
+Fx show 00d7ff
+
+# Rgb to hex…
+
+Fx convert —to-hex 135 135 215
+Fx show 135 135 215
+Fx show 8787d7
+
+# and from percent rgb to decimal rgb
+
+fx convert --to-dec 0.5 0.5 1
+
+

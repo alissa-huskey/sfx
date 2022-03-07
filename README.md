@@ -1,23 +1,26 @@
 sfx
 ===
+> A command line utility for previewing shell effects.
 
-> shell effects
+[![demo](https://asciinema.org/a/PegMucw4ZWFG7wR8e95agTKpn.svg)](https://asciinema.org/a/PegMucw4ZWFG7wR8e95agTKpn?autoplay=1)
 
-```
-fx show --rgb
-        --hex
-        --265
-        --16
-        --code
+Note: This is primarily a project for my personal use. It's has only been
+tested on my own machine and is most likely buggy.
 
-fx convert --to-rgb
-           --to-hex
-           --to-dec
+Usage
+-----
 
-fx get     --rgb
-           --hex
+| Command   | Description                        |
+|-----------|------------------------------------|
+| `list`    | list the various styles and colors |
+| `show`    | show a particular style or color   |
+| `get`     | get the true color for a 256 color |
+| `convert` | convert different types of colors  |
 
-fx list [ 16 | [265 [--bg]] ]
+Install
+-------
 
-
+```bash
+$ git clone https://github.com/alissa-huskey/sfx
+$ ./tools/build && ./tools install
 ```
