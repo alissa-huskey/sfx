@@ -70,8 +70,8 @@ show_hex() {
 
   hex_to_rgb -s $1 || exit $?
 
-  show_rgb -i ${rgb}
-  show_rgb ${rgb}
+  print_rgb -i ${rgb}
+  print_rgb ${rgb}
 }
 
 # usage: show_code [-n] CODE DISPLAY

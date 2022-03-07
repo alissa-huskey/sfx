@@ -33,7 +33,7 @@ usage() {
 END
 }
 
-# get the hex code for a 265 color code
+# get the hex code for a 256 color code
 #
 # usage: get_hex [-s] CODE
 #
@@ -54,7 +54,7 @@ get_hex() {
   color_num="$1" hex=""   # hex is not local so it can be reused
 
   [[ $# -eq 0 ]] && oops "What color number do you want to get?"
-  valid_256 "$color_num" || oops "Invalid 256 color: ${color_num}"
+  valid_256 "$color_num" || oops "Invalid 256 color: '${color_num}'"
 
   # this is a guess -- doesn't work with 3.2.57 though
   bash_ok 4 || oops "This feature requires bash 4+"

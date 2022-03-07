@@ -25,7 +25,7 @@ error() {
 # print error message if in debug mode
 debug() {
   is_verbose || return
-  printf "\e[33m>\e[0m %s\n" "${*}"
+  printf "\e[33mdebug>\e[0m %s\n" "${*}"
 }
 
 is_verbose() {

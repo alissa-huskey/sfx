@@ -17,7 +17,7 @@ docs() {
 
       list -- list the various styles and colors
       show -- show a particular style or color
-      get  -- get the true color for a 265 color
+      get  -- get the true color for a 256 color
       convert -- convert different types of colors
 
   options:
@@ -81,16 +81,16 @@ main() {
                                                                     ;;
   esac
 
-  cmd="${1:-list}"
+  : ${cmd:=${1:-list}}
 
   case $cmd in
-    -h|--help|help)       docs                                      ;;
-    -V|--version|version) version                                   ;;
-    list)                 ${bindir}/fx-list "$@"                    ;;
-    get)                  ${bindir}/fx-get "$@"                     ;;
-    show)                 ${bindir}/fx-show "$@"                    ;;
-    convert)              ${bindir}/fx-convert "$@"                 ;;
-     *)                   oops "Unrecognized command '${cmd}'"      ;;
+    -h|--help|help)          docs                                      ;;
+    -V|--version|version)    version                                   ;;
+    list|get|show|convert)
+                            debug "cmd: ${cmd}"                      
+                            "${bindir}/fx-${cmd}" "$@"
+                                                                       ;;
+    *)                       oops "Unrecognized command '${cmd}'"      ;;
   esac
 }
 

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+mydir="$(cd "${0%/*}/." && pwd -P)"
+
+main() {
+  for f in "${mydir}"/*.sh; do
+    "$f"
+  done
+}
+
+main
+

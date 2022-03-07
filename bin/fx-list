@@ -44,7 +44,7 @@ colors_256() {
   case "${layer}" in
     fg)  style=0                                     ;;
     bg)  style=7                                     ;;
-    *)   oops "Invalid 265 color option: '${1}'"     ;;
+    *)   oops "Invalid 256 color option: '${1}'"     ;;
   esac
 
   echo
@@ -88,25 +88,27 @@ all() {
 # print help information
 docs() {
   cat <<END
+
   fx list -- list styles and colors
 
-  usage: fx list [TYPE=265] [OPTIONS...]
+  usage: fx list [TYPE=256] [OPTIONS...]
 
   arguments:
       TYPE          what kind of things to list
-                    one of: 16, 265, styles all
+                    one of: 16, 256, styles all
 
   options:
 
-      -b|--bg       show background (for 265 colors)
+      -b|--bg       show background (for 256 colors)
       -h|--help     show help info
+
 END
 }
 
 # print usage information
 usage() {
   cat <<END
-  usage: fx list [-h] [TYPE=265] [OPTIONS...]
+  usage: fx list [-h] [TYPE=256] [OPTIONS...]
 END
 }
 
@@ -120,15 +122,14 @@ main() {
 
   init
 
-  type="${1:-256}"
+  type="${1:-256}" ; shift
 
   case $type in
-    16|-16)               colors_16                                ;;
-    -f|--fg|fg)           colors_256 fg                            ;;
+    16|--16)              colors_16                                ;;
     256|--256)            colors_256 ${1:-"$@"}                    ;;
     -b|--bg|bg)           colors_256 bg                            ;;
     -s|--style*|style*)   styles                                   ;;
-    all)                  all                                      ;;
+    all|--all)            all                                      ;;
     *)                    oops "Invalid argument: '${type}'"       ;;
   esac
 }
