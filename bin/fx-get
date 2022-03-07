@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+#
+# fx -- a simple utility to print ansi styles and colors
+#
+
+set -Eeo pipefail # fail on errors, even within pipes
+set +o posix      # using some noncompliant process redirection features
+
+bindir="$(cd "${0%/*}/." && pwd -P)"
+source "${bindir}/utils.sh"
+
+# print help information
+docs() {
+  cat <<END
+  fx get -- get the true color for a 256 color
+
+  usage: fx get [-h] FORMAT CODE
+
+  FORMAT arguments:
+
+      --rgb  CODE     get the RGB value for a 256 code (0-255)
+      --hex  CODE     get the hex code for a 256 code (0-255)
+
+  options:
+
+      -h|--help     show help info
+      -v|--verbose  show debug info
+
+END
+}
+
+# print usage information
+usage() {
+  cat <<END
+  usage: fx get [-h] FORMAT CODE
+END
+}
+
+# get the hex code for a 265 color code
+#
+# usage: get_hex [-s] CODE
+#
+# arguments:
+# -s      assign rgb variable but do not print
+# CODE    color to get (0-255)
+#
+get_hex() {
+  local ofs="$IFS" IFS=':/' color_num r g b
+
+  if [[ "$1" == "-s" ]]; then
+    shift
+    silent=true
+  fi
+
+  color_num="$1" hex=""   # hex is not local so it can be reused
+
+  [[ $# -eq 0 ]] && oops "What color number do you want to get?"
+  valid_256 "$color_num" || oops "Invalid 256 color: ${color_num}"
+
+  # this is a guess -- doesn't work with 3.2.57 though
+  bash_ok 4 || oops "This feature requires bash 4+"
+
+  # responds with someting like:
+  # 4;1;rgb:ca2d/1b53/0000\a\e\\
+  read -sr -t 0.1 -d $'\a' -p "$(printf '\e]4;%d;?\a' "$color_num")" _ r g b || :
+    # abort "Failed to query for color value."
+
+  b=${b%%$'\e'*} # strip trailing escape characters
+
+  IFS="$ofs"
+
+  [[ -z "$r" ]] && abort "Failed to query for color value."
+
+  hex="${r:0:2}${g:0:2}${b:0:2}"
+
+  [[ -n $silent ]] || echo "#$hex"
+}
+
+get_rgb() {
+  local hex
+  get_hex -s $1
+  hex_to_rgb "$hex"
+}
+
+main() {
+  local fmt color
+  local -a colors styles ansi_map
+  local -A color_map style_map
+
+  [[ "$1" == "get" ]] && shift
+
+  fmt="$1" color="$2"
+
+  [[ $# -eq 0 ]] && oops "What format and color do you want to get?"
+
+  init
+
+  case $fmt in
+    -h|--help|help)       docs                                      ;;
+    --rgb) shift ;        get_rgb $@                                ;;
+    --hex) shift ;        get_hex $@                                ;;
+    -*)                   oops "Unrecognized FORMAT: '${fmt}'"      ;;
+    *)                    oops "Missing required FORMAT."           ;;
+  esac
+}
+
+main ${1:+"$@"}

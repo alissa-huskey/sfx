@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+#
+# fx -- a simple utility to print ansi styles and colors
+#
+
+set -Eeo pipefail # fail on errors, even within pipes
+set +o posix      # using some noncompliant process redirection features
+
+bindir="$(cd "${0%/*}/." && pwd -P)"
+source "${bindir}/utils.sh"
+
+# print help information
+docs() {
+  cat <<END
+
+  fx convert -- convert different color formats
+
+  usage: fx convert [-h] FORMAT VALUE...
+
+  format arguments:
+
+      --to-hex   R G B [A]     RGB color to convert to hex code (0-255)
+      --to-rgb   HEX           hex code to convert to RGB values
+      --to-dec   R G B [A]     RGB percent values to convert to RGB decimal (0-1)
+
+  options:
+
+      -h|--help     show help info
+      -v|--verbose  show debug info
+
+END
+}
+
+# print usage information
+usage() {
+  cat <<END
+  usage: fx convert [-h] FORMAT VALUE...
+END
+}
+
+main() {
+  local fmt
+  local -a colors styles ansi_map
+  local -A color_map style_map
+
+  [[ "$1" == "convert" ]] && shift
+
+  fmt=${1}
+  init
+
+  [[ $# -eq 0 ]] && oops "What would you like to convert?"
+
+  case $fmt in
+    -h|--help|help)          docs                                      ;;
+    --to-hex)       shift ;  rgb_to_hex $@                             ;;
+    --to-rgb)       shift ;  hex_to_rgb $@                             ;;
+    --to-dec)       shift ;  percent_to_rgb $@                         ;;
+    -*)                      oops "Unrecognized FORMAT: '${fmt}'"      ;;
+    *)                       oops "Missing required FORMAT."           ;;
+  esac
+}
+
+main ${1:+"$@"}
+

@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+#
+# fx-list -- list the various colors and styles
+
+bindir="$(cd "${0%/*}/." && pwd -P)"
+source "${bindir}/utils.sh"
+
+# print 16 colors and names
+#
+# usage: colors_16
+#
+colors_16() {
+  local code style layer varient name
+
+  echo
+  for style in 0 7; do                   # default, invert
+    for varient in 3 9; do               # normal, light
+      printf " "
+      for i in {0..9}; do                # color digit
+        [[ $i -eq 8 ]] && continue
+
+        print_color -n $style $varient $i
+      done
+      echo
+    done
+  done
+  echo
+}
+
+# print 256 colors
+#
+# usage: colors_256 [fg|bg]
+#
+colors_256() {
+  local layer="${1:-fg}" style
+
+  layer="${layer##*-}"
+  [[ ${#layer} -eq 1 ]] && layer="${layer}g"
+
+  case "${layer}" in
+    fg)  style=0                                     ;;
+    bg)  style=7                                     ;;
+    *)   oops "Invalid 265 color option: '${1}'"     ;;
+  esac
+
+  echo
+  for i in {0..255} ; do
+    printf "  \e[%d;38;5;%sm%3s\e[0m  " ${style} $i $i
+    [ $(( (i+1) % 10)) -eq 0 ] && echo
+  done
+  printf "\n\n"
+}
+
+# print styles
+#
+# usage: styles
+#
+styles() {
+  local name
+
+  echo
+  for i in {0..9}; do
+    name=${styles[$i]}
+    [[ "$name" == "skip" ]] && continue
+    printf " \e[%dm[%s:%d]\e[0m " $i "${name}" $i
+  done
+  printf "\n\n"
+}
+
+# show all styles and colors
+all() {
+  {
+    styles
+    colors_16
+    colors_256 fg
+    colors_256 bg
+  } | ${PAGER:-less -R}
+}
+
+# print help information
+docs() {
+  cat <<END
+  fx list -- list styles and colors
+
+  usage: fx list [TYPE=265] [OPTIONS...]
+
+  arguments:
+      TYPE          what kind of things to list
+                    one of: 16, 265, styles all
+
+  options:
+
+      -b|--bg       show background (for 265 colors)
+      -h|--help     show help info
+END
+}
+
+# print usage information
+usage() {
+  cat <<END
+  usage: fx list [-h] [TYPE=265] [OPTIONS...]
+END
+}
+
+main() {
+  local type=${1:-256}
+  local -a colors styles ansi_map
+  local -A color_map style_map
+
+  [[ $# -ge 1 ]] && shift
+
+  init
+
+  case $type in
+    -h|--help|help)       docs                                     ;;
+    16|-16)               colors_16                                ;;
+    -f|--fg|fg)           colors_256 fg                            ;;
+    256|--256)            colors_256 ${1:-"$@"}                    ;;
+    -b|--bg|bg)           colors_256 bg                            ;;
+    -s|--style*|style*)   styles                                   ;;
+    all)                  all                                      ;;
+     *)                   oops "Invalid argument: '${type}'"       ;;
+  esac
+}
+
+main ${1:+"$@"}

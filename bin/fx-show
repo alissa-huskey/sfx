@@ -1,0 +1,262 @@
+#!/usr/bin/env bash
+#
+# fx -- a simple utility to print ansi styles and colors
+#
+
+set -Eeo pipefail # fail on errors, even within pipes
+set +o posix      # using some noncompliant process redirection features
+
+bindir="$(cd "${0%/*}/." && pwd -P)"
+source "${bindir}/utils.sh"
+
+# print help information
+docs() {
+  cat <<END
+
+  fx show -- show a color or style
+
+  usage: fx show [-h] [FORMAT] VALUE...
+
+  FORMAT arguments:
+
+      --rgb   R G B [A]       show the color for an RGB value
+      --color [bright] NAME   show the color for a NAME
+      --style NAME            show a style
+      --8     NUMBER          show the color with escape number ending in NUMBER
+      --256   NUMBER          show the color for a number 0-255
+      --hex   CODE            show the color for a hex code
+      --code  CODE            show the result of an escape code number
+
+  options:
+
+      -h|--help     show help info
+      -v|--verbose  show debug info
+
+END
+}
+
+# print usage information
+usage() {
+  cat <<END
+  usage: fx show [-h] [FORMAT] VALUE...
+END
+}
+
+# print an RGB color
+#
+# usage: print_rgb [-i] R G B
+print_rgb() {
+  local sep=$'\n' code display
+
+  if [[ $1 == "-i" ]]; then
+    sep=" "
+    printf "\e[7m"
+    shift
+  fi
+
+  printf "\e[38;2;%d;%d;%d;m%s\e[0m%s" $@ "$*" "$sep" 2> /dev/null || \
+    oops "Invalid RGB value: ${*}"
+}
+
+# print the foreground and background color for RGB balues
+show_rgb() {
+  debug "showing rgb color ${*}"
+  print_rgb -i $@
+  print_rgb $@
+}
+
+# print the foreground and background color a hex code
+show_hex() {
+  local rgb
+
+  debug "showing hex color: ${*}"
+
+  hex_to_rgb -s $1 || exit $?
+
+  show_rgb -i ${rgb}
+  show_rgb ${rgb}
+}
+
+# usage: show_code [-n] CODE DISPLAY
+show_code() {
+  local sep=$'\n' code display
+
+  debug "showing code: ${*}"
+
+  if [[ $1 == "-n" ]]; then
+    sep="  "
+    shift
+  fi
+
+  code="$1" display="${2:-$1}"
+
+  printf "\e[%dm%s\e[0m%s" $code "$display" "$sep"
+}
+
+# print all 16 color varients ending in digit CODE
+#
+# usage: show_8 CODE
+show_8() {
+  local code="$1"
+
+  debug "showing 8 ${*}"
+
+  print_color -n 0 3 $code
+  print_color -n 7 3 $code
+  print_color -n 0 9 $code "bright "
+  print_color    7 9 $code "bright "
+}
+
+# print the 16 color varient associated with NUMBER (0-16)
+#
+# usage: show_16 NUMBER
+show_16() {
+  local number="$1" code varient color prefix
+
+
+  debug "showing 16 ${*}"
+
+  code=${ansi_map[$number]}
+  varient=${code:0:1}
+  color=${code:1:1}
+
+  [[ ${varient} =~ ^(9|10)$ ]] && prefix="bright "
+
+  print_color -n 0 $varient $color "$prefix"
+  print_color    7 $varient $color "$prefix"
+}
+
+# print a 256 color
+#
+# usage: print_256 [-n] CODE
+print_256() {
+  local sep=$'\n' code
+
+  if [[ "$1" == "-n" ]]; then
+    sep=" "
+    shift
+  fi
+
+  code="$1"
+
+  printf "\e[38;5;%d;m%s\e[0m%s" ${code} ${code} "$sep"
+}
+
+# print the fg and bg color for CODE
+#
+# usage: show_256 CODE
+#
+show_256() {
+  local color="$1"
+
+  debug "showing 256 color: ${*}"
+
+  print_256 -n "${color}"
+  printf "\e[7m"
+  print_256 "${color}"
+}
+
+# print the foreground and background color for NAME
+#
+# usage: show_color [bright] NAME
+#
+show_color() {
+  local varient=3 name="" color code display layer
+
+  debug "showing color by name: ${*}"
+
+  if [[ "$1" =~ ^(light|bright) ]]; then
+    name="$1 "
+    varient=9
+    shift
+  fi
+
+  color="${color_map[$1]}"
+
+  print_color -n 0 $varient $color "$name"
+  print_color    7 $varient $color "$name"
+}
+
+show_style() {
+  debug "showing style: ${*}"
+  show_code ${style_map[$1]} $1
+}
+
+# guess the --from flag based on the values passed
+#
+# usage: guess VALUE...
+#
+# example:
+#
+# [x] $ show 135 95 255
+# [x] $ show yellow
+# [x] $ show '#fffc00'
+# [x] $ show 94              # 16 -- bright blue
+# [x] $ show 200             # 256
+# [x] $ show bold
+# [ ] $ show bright red
+guess_format() {
+
+  if [[ $# -eq 0 ]]; then
+    oops "Missing required argument: VALUE"
+
+  elif [[ $# -eq 3 ]]; then
+    format="--rgb"
+
+  elif valid_color "$1"; then
+    format="--color"
+
+  elif valid_style "$1"; then
+    format="--style"
+
+  elif valid_256 $1; then
+    format="--256"
+
+  elif valid_hex "${1}"; then
+    format="--hex"
+
+  elif valid_code $1; then
+    format="--code"
+
+  else
+    oops "Unable to determine FORMAT format for value(s): '${*}'"
+
+  fi
+
+}
+
+main() {
+  local -a colors styles ansi_map
+  local -A color_map style_map
+  local format
+
+  [[ "$1" == "show" ]] && shift
+
+  init
+
+  if [[ $1 =~ ^[-] ]]; then
+    format="$1"
+    shift
+  else
+    guess_format ${1:+"$@"}
+  fi
+
+  case $format in
+    -h|--help|help)     docs                 ;;
+    --rgb)              show_rgb "$@"        ;;
+    --color)            show_color "$@"      ;;
+    --style)            show_style "$@"      ;;
+    --8)                show_8 $1            ;;
+    --16)               show_16 $1           ;;
+    --256)              show_256 $1          ;;
+    --hex)              show_hex "$1"        ;;
+    --code)             show_code $1         ;;
+
+     *)
+            oops "Unrecognized argument: '${format}'"
+            ;;
+  esac
+}
+
+main ${1:+"$@"}
+

@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#
+# fx -- a simple utility to print ansi styles and colors
+#
+
+set -Eeo pipefail # fail on errors, even within pipes
+set +o posix      # using some noncompliant process redirection features
+
+bindir="$(cd "${0%/*}/." && pwd -P)"
+source "${bindir}/utils.sh"
+
+# print help information
+docs() {
+  cat <<END
+  fx -- a simple utility to print available styles and colors
+
+  usage: fx
+
+  commands:
+
+      list -- list the various styles and colors
+      show -- show a particular style or color
+      get  -- get the true color for a 265 color
+      convert -- convert different types of colors
+
+  options:
+
+      -h|--help     show help info
+      -v|--verbose  show debug info
+      -V|--version  show version
+
+END
+}
+
+# print usage information
+usage() {
+  cat <<END
+  usage: fx [-h] [COMMAND] [OPTIONS...]
+END
+}
+
+main() {
+  local type=${1:-256}
+  local -a colors styles ansi_map
+  local -A color_map style_map
+
+  init
+
+  case $type in
+    -h|--help|help)       docs                                      ;;
+
+    list) shift ; ${bindir}/fx-list "$@"   ;;
+    16|--16|256|--256|-s|--style*|style*|all)
+      ${bindir}/fx-list "$@"
+                                                                    ;;
+    -f|--fg|fg|-b|--bg|bg)
+      ${bindir}/fx-list "$@"
+                                                                    ;;
+
+
+    get)                  ${bindir}/fx-get "$@"                     ;;
+    show)                 ${bindir}/fx-show "$@"                    ;;
+    --to-*|convert)       ${bindir}/fx-convert "$@"                 ;;
+
+
+     *)                   oops "Unrecognized argument: '${type}'"   ;;
+  esac
+}
+
+main ${1:+"$@"}
