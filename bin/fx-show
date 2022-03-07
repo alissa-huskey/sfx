@@ -16,10 +16,11 @@ docs() {
 
   FORMAT arguments:
 
-      --rgb   R G B [A]       show the color for an RGB value
+      --rgb   R G B           show the color for an RGB value
       --color [bright] NAME   show the color for a NAME
       --style NAME            show a style
       --8     NUMBER          show the color with escape number ending in NUMBER
+      --16    NUMBER          show the color as numbered 0-16
       --256   NUMBER          show the color for a number 0-255
       --hex   CODE            show the color for a hex code
       --code  CODE            show the result of an escape code number
@@ -136,7 +137,7 @@ print_256() {
 
   code="$1"
 
-  printf "\e[38;5;%d;m%s\e[0m%s" ${code} ${code} "$sep"
+  printf "\e[38;5;%dm %s\e[0m%s" ${code} ${code} "$sep"
 }
 
 # print the fg and bg color for CODE

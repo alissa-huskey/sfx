@@ -24,3 +24,7 @@ Install
 $ git clone https://github.com/alissa-huskey/sfx
 $ ./tools/build && ./tools install
 ```
+
+---
+
+View this repository on GitHub: https://github.com/alissa-huskey/sfx

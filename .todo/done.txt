@@ -1,3 +1,5 @@
 x 2022-03-07 2022-03-06 add global --verbose
 x 2022-03-07 2022-03-06 unit tests
 x 2022-03-07 2022-03-06 build and install tools
+x 2022-03-07 2022-03-06 show fg and bg of all colors
+x 2022-03-07 2022-03-06 add fx show --16

@@ -1,8 +1,5 @@
-2022-03-06 add fx show --16
 2022-03-06 fix show hex so it shows the hex code, not the rgb value
-2022-03-06 show fg and bg of all colors
 2022-03-06 in convert rename --to-* to --*
 2022-03-06 add aliases like ls
-x 2022-03-07 2022-03-06 build and install tools
 2022-03-06 fix error handling in show (see show tests)
 2022-03-07 fx-get: either debug read in bats or add dry-run of some sort
