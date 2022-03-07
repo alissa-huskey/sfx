@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+rootdir="$(cd "${0%/*}/.." && pwd -P)"
+
+make_file() {
+  local file="$1"
+
+  sed -ne '1,/^[ ]*$/ p' ${file}
+  sed -e '1, /^[ ]*$/ d' ${rootdir}/bin/utils.sh
+  sed -e '1,/^source/ d' ${file}
+}
+
+main() {
+  local name f dest
+
+  mkdir -p ${rootdir}/build
+
+  for f in "${rootdir}/bin"/fx*; do
+    name="${f##*/}"
+    dest=${rootdir}/build/${name}
+
+    make_file "$f" > "${dest}"
+    chmod +x "${dest}"
+  done
+}
+
+main

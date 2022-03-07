@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+rootdir="$(cd "${0%/*}/.." && pwd -P)"
+
+main() {
+	bats ${rootdir}/tests/unit
+	bats ${rootdir}/tests/integration
+	${rootdir}/tests/visual/run
+}
+
+main

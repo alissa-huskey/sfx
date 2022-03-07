@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+rootdir="$(cd "${0%/*}/.." && pwd -P)"
+
+main() {
+  local destdir="/usr/local/bin" name dest
+
+  for f in "${rootdir}/build"/*; do
+    name="${f##*/}"
+    dest="${destdir}/${name}"
+    cp "$f" "$dest"
+  done
+}
+
+main

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+rootdir="$(cd "${0%/*}/.." && pwd -P)"
+
+main() {
+  rm -r ${rootdir}/build
+}
+
+main
