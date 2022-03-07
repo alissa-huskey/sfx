@@ -7,11 +7,11 @@ make_file() {
 
   sed -ne '1,/^[ ]*$/ p' ${file}
   sed -e '1, /^[ ]*$/ d' ${rootdir}/bin/utils.sh
-  sed -e '1,/^source/ d' ${file}
+  sed -e '1,/^[ ]*$/ d; /^bindir=/ s_^bindir=".*"_bindir="'"${install_dir}"'"_ ; /^source/ d' ${file}
 }
 
 main() {
-  local name f dest
+  local name f dest install_dir="/usr/local/bin"
 
   mkdir -p ${rootdir}/build
 
