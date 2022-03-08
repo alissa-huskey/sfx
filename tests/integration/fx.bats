@@ -3,14 +3,14 @@
 load 'helper'
 
 @test "fx" {
-  run ${bin}/fx -v
+  run ${bindir}/fx -v
 
   assert_success
   assert_output --regexp "debug>.* cmd: list"
 }
 
 @test "fx list" {
-  run ${bin}/fx list -v --help
+  run ${bindir}/fx list -v --help
 
   assert_success
   assert_line --regexp "debug>.* cmd: list"
@@ -18,7 +18,7 @@ load 'helper'
 }
 
 @test "fx get" {
-  run ${bin}/fx get -v --help
+  run ${bindir}/fx get -v --help
 
   assert_success
   assert_line --regexp "debug>.* cmd: get"
@@ -26,7 +26,7 @@ load 'helper'
 }
 
 @test "fx show" {
-  run ${bin}/fx show -v --help
+  run ${bindir}/fx show -v --help
 
   assert_success
   assert_line --regexp "debug>.* cmd: show"
@@ -34,7 +34,7 @@ load 'helper'
 }
 
 @test "fx convert" {
-  run ${bin}/fx convert -v --help
+  run ${bindir}/fx convert -v --help
 
   assert_success
   assert_line --regexp "debug>.* cmd: convert"
@@ -42,14 +42,14 @@ load 'helper'
 }
 
 @test "fx --help" {
-  run ${bin}/fx --help
+  run ${bindir}/fx --help
 
   assert_success
   assert_output --partial "fx -- a simple utility to print available styles and colors"
 }
 
 @test "fx --version" {
-  run ${bin}/fx --version
+  run ${bindir}/fx --version
 
   assert_success
   assert_output --regexp "fx version [0-9]+[.][0-9]+[.][0-9]+"

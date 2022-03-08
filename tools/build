@@ -5,9 +5,17 @@ rootdir="$(cd "${0%/*}/.." && pwd -P)"
 make_file() {
   local file="$1"
 
-  sed -ne '1,/^[ ]*$/ p' ${file}
+  # print the beginning of the file
+  sed -ne '1,/^[ ]*$/ p ; /^me=/ p ;' ${file}
+
+  # define the bindir variable as the install dir
+  printf 'bindir="%s"\n\n' "${install_dir}"
+
+  # print the utils includes
   sed -e '1, /^[ ]*$/ d' ${rootdir}/bin/utils.sh
-  sed -e '1,/^[ ]*$/ d; /^bindir=/ s_^bindir=".*"_bindir="'"${install_dir}"'"_ ; /^source/ d' ${file}
+
+  # print the rest of the file
+  sed -e '1,/^source/ d' ${file}
 }
 
 main() {

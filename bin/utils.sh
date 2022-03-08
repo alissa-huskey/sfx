@@ -261,3 +261,24 @@ options() {
     esac
   done
 }
+
+# call main if the script is being executed, but not if it's sourced
+#
+#    determined by if the executing script is not the same as the
+#    script that sourced utils.sh
+#
+# depends on
+#
+# - me set to ${BASH_SOURCE[0]} by sourcing script
+#
+# usage: run_cmd ${1:+"$@"}
+#
+run_cmd() {
+  local runner="$0"
+
+  if [[ ${runner} == "$me" ]]; then
+    main ${1:+"$@"}
+  fi
+
+}
+

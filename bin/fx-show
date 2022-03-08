@@ -3,7 +3,9 @@
 # fx -- a simple utility to print ansi styles and colors
 #
 
-bindir="$(cd "${0%/*}/." && pwd -P)"
+me="${BASH_SOURCE[0]}"
+exedir="$(cd "${0%/*}/." && pwd -P)"
+: "${bindir:=$exedir}"
 source "${bindir}/utils.sh"
 
 # print help information
@@ -42,9 +44,9 @@ END
 
 # print an RGB color
 #
-# usage: print_rgb [-i] R G B
+# usage: print_rgb [-i] R G B [TITLE]
 print_rgb() {
-  local sep=$'\n' code display
+  local sep=$'\n' code title
 
   if [[ $1 == "-i" ]]; then
     sep=" "
@@ -52,7 +54,14 @@ print_rgb() {
     shift
   fi
 
-  printf "\e[38;2;%d;%d;%d;m%s\e[0m%s" $@ "$*" "$sep" 2> /dev/null || \
+  title="$*"
+  if [[ $# -eq 4 ]]; then
+    title="$4"
+    # remove $4 from the $@
+    set -- "${@:1:3}"
+  fi
+
+  printf "\e[38;2;%d;%d;%d;m%s\e[0m%s" $@ "${title}" "$sep" 2> /dev/null || \
     oops "Invalid RGB value: ${*}"
 }
 
@@ -65,14 +74,14 @@ show_rgb() {
 
 # print the foreground and background color a hex code
 show_hex() {
-  local rgb
+  local rgb hex="$1"
 
   debug "showing hex color: ${*}"
 
-  hex_to_rgb -s $1 || exit $?
+  hex_to_rgb -s "$hex" || exit $?
 
-  print_rgb -i ${rgb}
-  print_rgb ${rgb}
+  print_rgb -i ${rgb} "${hex}"
+  print_rgb ${rgb} "${hex}"
 }
 
 # usage: show_code [-n] CODE DISPLAY
@@ -257,5 +266,4 @@ main() {
   esac
 }
 
-main ${1:+"$@"}
-
+run_cmd ${1:+"$@"}

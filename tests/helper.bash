@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 rootdir="$( cd -P "${BATS_TEST_DIRNAME}/../.." && echo "$PWD" )"
-bin="${rootdir}/bin"
+bindir="${rootdir}/bin"
 
 p() {
   while read -r line; do

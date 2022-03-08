@@ -3,9 +3,9 @@
 rootdir="$(cd "${0%/*}/.." && pwd -P)"
 
 main() {
-	bats ${rootdir}/tests/unit
-	bats ${rootdir}/tests/integration
-	${rootdir}/tests/visual/run
+	bats ${rootdir}/tests/unit || exit $?
+	bats ${rootdir}/tests/integration || exit $?
+	${rootdir}/tests/visual/run || exit $?
 }
 
 main
