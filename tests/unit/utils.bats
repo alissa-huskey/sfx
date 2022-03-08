@@ -154,7 +154,7 @@ usage() { : ; }
   run percent_to_rgb xx
 
   assert_failure 2
-  assert_output --partial "Not a valid argument: 'xx'"
+  assert_output --partial "Invalid RGB percent value: 'xx'"
 }
 
 @test "print_color STYLE VARIENT COLOR" {

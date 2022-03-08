@@ -3,6 +3,8 @@
 main() {
   local args reply
 
+  export PAGER=cat
+
   for args in --help "" 16 styles 256 "256 --bg" all; do
     clear
     echo fx-list ${args}

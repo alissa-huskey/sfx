@@ -97,6 +97,8 @@ show_code() {
 
   code="$1" display="${2:-$1}"
 
+  valid_code "$code" || oops "Invalid escape code number: '$code'"
+
   printf "\e[%dm%s\e[0m%s" $code "$display" "$sep"
 }
 
@@ -105,6 +107,8 @@ show_code() {
 # usage: show_8 CODE
 show_8() {
   local code="$1"
+
+  valid_8 "$code" || oops "Invalid code: '$code' (ok: 0-9 except 8)"
 
   debug "showing 8 ${*}"
 
@@ -120,8 +124,9 @@ show_8() {
 show_16() {
   local number="$1" code varient color prefix
 
-
   debug "showing 16 ${*}"
+
+  valid_16 "$number" || oops "Invalid code: '$number' (ok: 0-16)"
 
   code=${ansi_map[$number]}
   varient=${code:0:1}
@@ -158,6 +163,8 @@ show_256() {
 
   debug "showing 256 color: ${*}"
 
+  valid_256 "$color" || oops "Invalid code: '$color' (ok: 0-255)"
+
   print_256 -n "${color}"
   printf "\e[7m"
   print_256 "${color}"
@@ -169,6 +176,8 @@ show_256() {
 #
 show_color() {
   local varient=3 name="" color code display layer
+
+  valid_color $1 || oops "Invalid color: '$1'"
 
   debug "showing color by name: ${*}"
 
@@ -186,6 +195,7 @@ show_color() {
 
 show_style() {
   debug "showing style: ${*}"
+  valid_style "$1" || oops "Invalid style: '$1'"
   show_code ${style_map[$1]} $1
 }
 

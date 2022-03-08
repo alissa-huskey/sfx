@@ -32,6 +32,15 @@ is_verbose() {
   [[ -n ${verbose} ]]
 }
 
+valid_8() {
+  [[ "$1" == "8" ]] && return 1
+  [[ "$1" =~ ^[0-9]+$ ]] && [[ $1 -le 9 ]]
+}
+
+valid_16() {
+  [[ "$1" =~ ^[0-9]+$ ]] && [[ $1 -lt 16 ]]
+}
+
 valid_256() {
   [[ "$1" =~ ^[0-9]+$ ]] && [[ $1 -le 255 ]]
 }
@@ -39,6 +48,11 @@ valid_256() {
 valid_hex() {
   local string="${1}"
   [[ "$string" =~ ^[a-zA-Z0-9]+$ ]] && [[ ${#string} =~ ^[3684]$ ]]
+}
+
+valid_percent() {
+  [[ "$1" =~ ^[0-9.]*$ ]] || return 1
+  [[ $(bc <<< "$1 >= 0 && $1 <= 1") == 1 ]]
 }
 
 valid_code() {
@@ -234,7 +248,7 @@ percent_to_rgb() {
   local value rgb
 
   while [[ $# -gt 0 ]]; do
-    [[ "$1" =~ ^[0-9.]*$ ]] || oops "Not a valid argument: '$1'"
+    valid_percent "$1" || oops "Invalid RGB percent value: '$1' (ok: 0-1)"
 
     value=$(bc <<< "$1*255")
 

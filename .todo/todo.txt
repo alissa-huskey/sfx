@@ -1,6 +1,5 @@
-2022-03-06 fix show hex so it shows the hex code, not the rgb value
 2022-03-06 in convert rename --to-* to --*
 2022-03-06 add aliases like ls
-2022-03-06 fix error handling in show (see show tests)
 2022-03-07 fx-get: either debug read in bats or add dry-run of some sort
 2022-03-07 adjust width of output based on width of terminal
+2022-03-07 figure out 0-16

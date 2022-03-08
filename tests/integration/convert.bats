@@ -57,7 +57,6 @@ load 'helper'
 }
 
 @test "[user-error] fx-convert --to-dec INVALID-NUM" {
-  skip "TODO: fix"
   run ${bindir}/fx-convert --to-dec 3 5 7
   assert_failure 2
   assert_output --partial "Invalid RGB percent value: '3'"
@@ -66,7 +65,7 @@ load 'helper'
 @test "[user-error] fx-convert --to-dec INVALID" {
   run ${bindir}/fx-convert --to-dec xxx
   assert_failure 2
-  assert_output --partial "Not a valid argument: 'xxx'"
+  assert_output --partial "Invalid RGB percent value: 'xxx'"
 }
 
 @test "[user-error] fx-convert" {

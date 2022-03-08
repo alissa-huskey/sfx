@@ -65,7 +65,6 @@ load 'helper'
 }
 
 @test "[user-error] fx-show --color INVALID" {
-  skip  "TODO: fix"
   run ${bindir}/fx-show --color purple
 
   assert_failure 2
@@ -73,7 +72,6 @@ load 'helper'
 }
 
 @test "[user-error] fx-show --style STYLE" {
-  skip "TODO: fix"
   run ${bindir}/fx-show --style super
 
   assert_failure 2
@@ -81,32 +79,28 @@ load 'helper'
 }
 
 @test "[user-error] fx-show --8 INVALID" {
-  skip "TODO: fix"
   run ${bindir}/fx-show --8 10
   assert_failure 2
-  assert_output --partial "Invalid color: '10'"
+  assert_output --partial "Invalid code: '10'"
 }
 
 @test "[user-error] fx-show --16 INVALID" {
-  skip "TODO: fix"
-  run ${bindir}/fx-show --16 14
+  run ${bindir}/fx-show --16 24
 
   assert_failure 2
-  assert_output --partial "Invalid color: '14'"
+  assert_output --partial "Invalid code: '24'"
 }
 
 @test "[user-error] fx-show --256 INVALID-NUMBER" {
-  skip "TODO: fix"
   run ${bindir}/fx-show --256 300
   assert_failure 2
-  assert_output --partial "Invalid 256 color: '222'"
+  assert_output --partial "Invalid code: '300'"
 }
 
 @test "[user-error] fx-show --256 INVALID" {
-  skip "TODO: fix"
   run ${bindir}/fx-show --256 xxx
   assert_failure 2
-  assert_output --partial "Invalid 256 color: 'xxx'"
+  assert_output --partial "Invalid code: 'xxx'"
 }
 
 @test "[user-error] fx-show --hex INVALID" {
@@ -116,14 +110,12 @@ load 'helper'
 }
 
 @test "[user-error] fx-show --code INVALID-NUM" {
-  skip "TODO: fix"
   run ${bindir}/fx-show --code 902
   assert_failure 2
   assert_output --partial "Invalid escape code number: '902'"
 }
 
 @test "[user-error] fx-show --code INVALID" {
-  skip "TODO: fix"
   run ${bindir}/fx-show --code xxx
   assert_failure 2
   assert_output --partial "Invalid escape code number: 'xxx'"
@@ -211,7 +203,6 @@ load 'helper'
 }
 
 @test "[user-error] fx-show FORMAT" {
-  skip "TODO: fix"
   for format in rgb color style 8 16 256 hex code; do
     run ${bindir}/fx-show --$format
     assert_failure 2
